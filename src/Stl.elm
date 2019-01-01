@@ -1,6 +1,4 @@
-module Stl exposing (Triangles, binaryStl, loopNumbers, makeThing1, makeThing2, makeThing3, numsToTriangle, numsToVec3)
-
---import Bytes.Encode as BE exposing (Encoder)
+module Stl exposing (Triangle, Triangles, binaryStl)
 
 import Bytes exposing (Endianness(..))
 import Bytes.Decode as BD exposing (Decoder, Step)
