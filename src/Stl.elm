@@ -1,16 +1,38 @@
 module Stl exposing (Triangle, Triangles, binaryStl)
 
+{-| A parser for binary STL files. Pretty much went by wikipedia on the STL format and tested on a few models.
+No special STL features supported, just the basic format which is:
+80 bytes of stuff-we-ignore
+int32 triangle count.
+float32s - 12 for each triangle - normal, vertex 1, vertex 2, vertex 3
+
+      # Types
+
+      @docs Triangle
+      @docs Triangles
+
+
+      # Functions
+
+      @docs binaryStl
+
+-}
+
 import Bytes exposing (Endianness(..))
 import Bytes.Decode as BD exposing (Decoder, Step)
 import Math.Vector3 as Vec3 exposing (Vec3, vec3)
 
 
+{-| A Triangle is a normal Vec3 and a triple of Vec3 for the vertices
+-}
 type alias Triangle =
     { normal : Vec3
     , vertices : ( Vec3, Vec3, Vec3 )
     }
 
 
+{-| Triangles is a list of Triangle
+-}
 type alias Triangles =
     List Triangle
 
