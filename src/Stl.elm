@@ -1,4 +1,8 @@
-module Stl exposing (Triangle, Triangles, binaryStl)
+module Stl exposing
+    ( Triangle
+    , Triangles
+    , binaryStl
+    )
 
 {-| A parser for binary STL files. Pretty much went by wikipedia on the STL format and tested on a few models.
 No special STL features supported, just the basic format which is:
@@ -6,15 +10,16 @@ No special STL features supported, just the basic format which is:
 int32 triangle count.
 float32s - 12 for each triangle - normal, vertex 1, vertex 2, vertex 3
 
-      # Types
 
-      @docs Triangle
-      @docs Triangles
+# Types
+
+@docs Triangle
+@docs Triangles
 
 
-      # Functions
+# Functions
 
-      @docs binaryStl
+@docs binaryStl
 
 -}
 
@@ -95,14 +100,15 @@ numsToTriangle floats =
 -}
 binaryStl : Decoder Triangles
 binaryStl =
+    -- 80 bytes of we-don't-care
     BD.bytes 80
-        -- 80 bytes of we-don't-care
         |> BD.andThen
             (\_ ->
+                -- followed by number of triangles
                 BD.unsignedInt32 LE
-                    -- followed by number of triangles
                     |> BD.andThen
                         (\count ->
+                            -- and finally the triangles themselves
                             BD.loop
                                 ( count, [] )
                                 loopTriangle
