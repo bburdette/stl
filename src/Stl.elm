@@ -4,7 +4,8 @@ module Stl exposing
     , binaryStl
     )
 
-{-| A parser for binary STL files. Pretty much went by wikipedia on the STL format and tested on a few models.
+{-| A parser for binary STL files - the 3d models that are just a list of triangles.
+Pretty much went by wikipedia on the STL format and tested on a few models.
 No special STL features supported, just the basic format which is:
 80 bytes of stuff-we-ignore
 int32 triangle count.
@@ -96,7 +97,7 @@ numsToTriangle floats =
             )
 
 
-{-| Binary decoder for Stl files!
+{-| Binary decoder for Stl files.
 -}
 binaryStl : Decoder Triangles
 binaryStl =
