@@ -7,9 +7,11 @@ module Stl exposing
 {-| A parser for binary STL files - the 3d models that are just a list of triangles.
 Pretty much went by wikipedia on the STL format and tested on a few models.
 No special STL features supported, just the basic format which is:
-80 bytes of stuff-we-ignore
-int32 triangle count.
-float32s - 12 for each triangle - normal, vertex 1, vertex 2, vertex 3
+
+  - 80 bytes of stuff-we-ignore
+  - int32 triangle count.
+  - float32s - 12 for each triangle - normal, vertex 1, vertex 2, vertex 3
+  - after each triangle, 2 bytes are ignored.
 
 
 # Types
