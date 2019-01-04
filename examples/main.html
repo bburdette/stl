@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta name="description" content="get some triangles"
+    <meta charset="UTF-8">
+    <title>stl example</title>
+    <meta name="viewport" content="width=device-width">
+    <style>html,head,body { padding:0; margin:0; } 
+      body { font-family: calibri, helvetica, arial, sans-serif; }</style>
+    <script type="text/javascript" src="main.js"></script>
+    </head>
+  <body>
+    <div id="elm"></div> 
+    <script type="text/javascript">
+      Elm.Main.init(
+        { node: document.getElementById("elm"),
+          flags: { location : document.location.pathname || "", 
+                   width : window.innerWidth, 
+                   height : window.innerHeight
+                 }
+        });
+    </script>
+  </body>
+</html>
