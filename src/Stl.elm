@@ -2,6 +2,7 @@ module Stl exposing
     ( Triangle
     , Triangles
     , binaryStl
+    , andMap
     )
 
 {-| A parser for binary STL files - the 3d models that are just a list of triangles.
@@ -55,6 +56,60 @@ rest list =
             elts
 
 
+andMap : BD.Decoder a -> BD.Decoder (a -> b) -> BD.Decoder b
+andMap next current =
+    BD.map2 (<|) current next
+
+
+
+{-
+   -- well that doesn't work
+   apply count f list =
+       if count == 0 then
+           Just f
+
+       else
+           case List.head list of
+               Just a ->
+                   apply (count - 1) (f a) (rest list)
+
+               Nothing ->
+                   Nothing
+-}
+
+
+decodeVec3 : Decoder Vec3
+decodeVec3 =
+    BD.succeed vec3
+        |> andMap (BD.float32 LE)
+        |> andMap (BD.float32 LE)
+        |> andMap (BD.float32 LE)
+
+
+decodeTriangle : Decoder Triangle
+decodeTriangle =
+    BD.succeed (\normal v1 v2 v3 -> { normal = normal, vertices = ( v1, v2, v3 ) })
+        |> andMap decodeVec3
+        |> andMap decodeVec3
+        |> andMap decodeVec3
+        |> andMap decodeVec3
+
+
+
+{-
+
+
+   With it, you can decode Vec3 in one go:
+
+   ```decodeVec3 : Decoder Vec3
+   decodeVec3 =
+       Decode.succeed vec3
+           |> andMap float32
+           |> andMap float32
+           |> andMap float32```
+-}
+
+
 makeThing3 : (a -> a -> a -> b) -> List a -> Maybe ( b, List a )
 makeThing3 f lst =
     Maybe.map f (List.head lst)
@@ -75,7 +130,23 @@ makeThing1 f lst =
 
 numsToVec3 : List Float -> Maybe ( Vec3, List Float )
 numsToVec3 nums =
-    makeThing3 vec3 nums
+    makeThing1 vec3 nums
+        |> Maybe.andThen
+            (\( f, l ) ->
+                makeThing1 f l
+                    |> Maybe.andThen
+                        (\( g, m ) ->
+                            makeThing1 g m
+                        )
+            )
+
+
+
+{-
+   numsToVec3 : List Float -> Maybe ( Vec3, List Float )
+   numsToVec3 nums =
+       makeThing3 vec3 nums
+-}
 
 
 numsToTriangle : List Float -> Maybe Triangle
@@ -127,23 +198,48 @@ loopTriangle ( count, triangles ) =
 
     else
         -- first get 12 float32s
-        BD.loop ( 12, [] )
-            loopNumbers
+        decodeTriangle
             |> BD.andThen
                 (\t ->
                     -- then ignore 2 bytes
                     BD.bytes 2
                         |> BD.andThen
                             (\_ ->
-                                -- build the list in reverse order because its faster.
-                                case numsToTriangle t of
-                                    Just tri ->
-                                        BD.succeed (BD.Loop ( count - 1, tri :: triangles ))
-
-                                    Nothing ->
-                                        BD.fail
+                                BD.succeed (BD.Loop ( count - 1, t :: triangles ))
                             )
                 )
+
+
+
+{-
+   loopTriangle : ( Int, Triangles ) -> Decoder (Step ( Int, Triangles ) Triangles)
+   loopTriangle ( count, triangles ) =
+       if count == 0 then
+           -- reverse the reversed list at the end.
+           BD.succeed (BD.Done <| List.reverse triangles)
+
+       else
+           -- first get 12 float32s
+           --decodeTriangle
+           BD.loop
+               ( 12, [] )
+               loopNumbers
+               |> BD.andThen
+                   (\t ->
+                       -- then ignore 2 bytes
+                       BD.bytes 2
+                           |> BD.andThen
+                               (\_ ->
+                                   -- build the list in reverse order because its faster.
+                                   case numsToTriangle t of
+                                       Just tri ->
+                                           BD.succeed (BD.Loop ( count - 1, tri :: triangles ))
+
+                                       Nothing ->
+                                           BD.fail
+                               )
+                   )
+-}
 
 
 loopNumbers : ( Int, List Float ) -> Decoder (Step ( Int, List Float ) (List Float))
