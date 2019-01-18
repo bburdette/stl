@@ -61,23 +61,6 @@ andMap next current =
     BD.map2 (<|) current next
 
 
-
-{-
-   -- well that doesn't work
-   apply count f list =
-       if count == 0 then
-           Just f
-
-       else
-           case List.head list of
-               Just a ->
-                   apply (count - 1) (f a) (rest list)
-
-               Nothing ->
-                   Nothing
--}
-
-
 decodeVec3 : Decoder Vec3
 decodeVec3 =
     BD.succeed vec3
@@ -93,21 +76,6 @@ decodeTriangle =
         |> andMap decodeVec3
         |> andMap decodeVec3
         |> andMap decodeVec3
-
-
-
-{-
-
-
-   With it, you can decode Vec3 in one go:
-
-   ```decodeVec3 : Decoder Vec3
-   decodeVec3 =
-       Decode.succeed vec3
-           |> andMap float32
-           |> andMap float32
-           |> andMap float32```
--}
 
 
 makeThing3 : (a -> a -> a -> b) -> List a -> Maybe ( b, List a )
@@ -128,6 +96,12 @@ makeThing1 f lst =
         |> Maybe.andThen (\fb -> Just ( fb, rest lst ))
 
 
+makeThing1x : (a -> b) -> List a -> Maybe ( b, List a )
+makeThing1x f lst =
+    Maybe.map f (List.head lst)
+        |> Maybe.andThen (\fb -> Just ( fb, rest lst ))
+
+
 numsToVec3 : List Float -> Maybe ( Vec3, List Float )
 numsToVec3 nums =
     makeThing1 vec3 nums
@@ -141,35 +115,6 @@ numsToVec3 nums =
             )
 
 
-
-{-
-   numsToVec3 : List Float -> Maybe ( Vec3, List Float )
-   numsToVec3 nums =
-       makeThing3 vec3 nums
--}
-
-
-numsToTriangle : List Float -> Maybe Triangle
-numsToTriangle floats =
-    numsToVec3 floats
-        |> Maybe.andThen
-            (\( v1, flts ) ->
-                numsToVec3 flts
-                    |> Maybe.andThen
-                        (\( v2, flts2 ) ->
-                            numsToVec3 flts2
-                                |> Maybe.andThen
-                                    (\( v3, flts3 ) ->
-                                        numsToVec3 flts3
-                                            |> Maybe.andThen
-                                                (\( v4, flts4 ) ->
-                                                    Just { normal = v1, vertices = ( v2, v3, v4 ) }
-                                                )
-                                    )
-                        )
-            )
-
-
 {-| Binary decoder for Stl files.
 -}
 binaryStl : Decoder Triangles
@@ -178,7 +123,7 @@ binaryStl =
     BD.bytes 80
         |> BD.andThen
             (\_ ->
-                -- followed by number of triangles
+                -- followed by the number of triangles
                 BD.unsignedInt32 LE
                     |> BD.andThen
                         (\count ->
@@ -197,7 +142,7 @@ loopTriangle ( count, triangles ) =
         BD.succeed (BD.Done <| List.reverse triangles)
 
     else
-        -- first get 12 float32s
+        -- first get 12 float32s (to make 1 triangle)
         decodeTriangle
             |> BD.andThen
                 (\t ->
@@ -207,49 +152,4 @@ loopTriangle ( count, triangles ) =
                             (\_ ->
                                 BD.succeed (BD.Loop ( count - 1, t :: triangles ))
                             )
-                )
-
-
-
-{-
-   loopTriangle : ( Int, Triangles ) -> Decoder (Step ( Int, Triangles ) Triangles)
-   loopTriangle ( count, triangles ) =
-       if count == 0 then
-           -- reverse the reversed list at the end.
-           BD.succeed (BD.Done <| List.reverse triangles)
-
-       else
-           -- first get 12 float32s
-           --decodeTriangle
-           BD.loop
-               ( 12, [] )
-               loopNumbers
-               |> BD.andThen
-                   (\t ->
-                       -- then ignore 2 bytes
-                       BD.bytes 2
-                           |> BD.andThen
-                               (\_ ->
-                                   -- build the list in reverse order because its faster.
-                                   case numsToTriangle t of
-                                       Just tri ->
-                                           BD.succeed (BD.Loop ( count - 1, tri :: triangles ))
-
-                                       Nothing ->
-                                           BD.fail
-                               )
-                   )
--}
-
-
-loopNumbers : ( Int, List Float ) -> Decoder (Step ( Int, List Float ) (List Float))
-loopNumbers ( count, nums ) =
-    if count == 0 then
-        BD.succeed (BD.Done (List.reverse nums))
-
-    else
-        BD.float32 LE
-            |> BD.andThen
-                (\num ->
-                    BD.succeed (BD.Loop ( count - 1, num :: nums ))
                 )
