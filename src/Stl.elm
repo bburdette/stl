@@ -2,7 +2,6 @@ module Stl exposing
     ( Triangle
     , Triangles
     , binaryStl
-    , andMap
     )
 
 {-| A parser for binary STL files - the 3d models that are just a list of triangles.
