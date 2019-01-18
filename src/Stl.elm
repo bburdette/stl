@@ -55,6 +55,28 @@ rest list =
             elts
 
 
+andMap : BD.Decoder a -> BD.Decoder (a -> b) -> BD.Decoder b
+andMap next current =
+    BD.map2 (<|) current next
+
+
+decodeVec3 : Decoder Vec3
+decodeVec3 =
+    BD.succeed vec3
+        |> andMap (BD.float32 LE)
+        |> andMap (BD.float32 LE)
+        |> andMap (BD.float32 LE)
+
+
+decodeTriangle : Decoder Triangle
+decodeTriangle =
+    BD.succeed (\normal v1 v2 v3 -> { normal = normal, vertices = ( v1, v2, v3 ) })
+        |> andMap decodeVec3
+        |> andMap decodeVec3
+        |> andMap decodeVec3
+        |> andMap decodeVec3
+
+
 makeThing3 : (a -> a -> a -> b) -> List a -> Maybe ( b, List a )
 makeThing3 f lst =
     Maybe.map f (List.head lst)
@@ -73,28 +95,21 @@ makeThing1 f lst =
         |> Maybe.andThen (\fb -> Just ( fb, rest lst ))
 
 
+makeThing1x : (a -> b) -> List a -> Maybe ( b, List a )
+makeThing1x f lst =
+    Maybe.map f (List.head lst)
+        |> Maybe.andThen (\fb -> Just ( fb, rest lst ))
+
+
 numsToVec3 : List Float -> Maybe ( Vec3, List Float )
 numsToVec3 nums =
-    makeThing3 vec3 nums
-
-
-numsToTriangle : List Float -> Maybe Triangle
-numsToTriangle floats =
-    numsToVec3 floats
+    makeThing1 vec3 nums
         |> Maybe.andThen
-            (\( v1, flts ) ->
-                numsToVec3 flts
+            (\( f, l ) ->
+                makeThing1 f l
                     |> Maybe.andThen
-                        (\( v2, flts2 ) ->
-                            numsToVec3 flts2
-                                |> Maybe.andThen
-                                    (\( v3, flts3 ) ->
-                                        numsToVec3 flts3
-                                            |> Maybe.andThen
-                                                (\( v4, flts4 ) ->
-                                                    Just { normal = v1, vertices = ( v2, v3, v4 ) }
-                                                )
-                                    )
+                        (\( g, m ) ->
+                            makeThing1 g m
                         )
             )
 
@@ -107,7 +122,7 @@ binaryStl =
     BD.bytes 80
         |> BD.andThen
             (\_ ->
-                -- followed by number of triangles
+                -- followed by the number of triangles
                 BD.unsignedInt32 LE
                     |> BD.andThen
                         (\count ->
@@ -126,34 +141,14 @@ loopTriangle ( count, triangles ) =
         BD.succeed (BD.Done <| List.reverse triangles)
 
     else
-        -- first get 12 float32s
-        BD.loop ( 12, [] )
-            loopNumbers
+        -- first get 12 float32s (to make 1 triangle)
+        decodeTriangle
             |> BD.andThen
                 (\t ->
                     -- then ignore 2 bytes
                     BD.bytes 2
                         |> BD.andThen
                             (\_ ->
-                                -- build the list in reverse order because its faster.
-                                case numsToTriangle t of
-                                    Just tri ->
-                                        BD.succeed (BD.Loop ( count - 1, tri :: triangles ))
-
-                                    Nothing ->
-                                        BD.fail
+                                BD.succeed (BD.Loop ( count - 1, t :: triangles ))
                             )
-                )
-
-
-loopNumbers : ( Int, List Float ) -> Decoder (Step ( Int, List Float ) (List Float))
-loopNumbers ( count, nums ) =
-    if count == 0 then
-        BD.succeed (BD.Done (List.reverse nums))
-
-    else
-        BD.float32 LE
-            |> BD.andThen
-                (\num ->
-                    BD.succeed (BD.Loop ( count - 1, num :: nums ))
                 )
