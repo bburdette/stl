@@ -1161,66 +1161,6 @@ var _Bytes_read_string = F3(function(len, bytes, offset)
 var _Bytes_decodeFailure = F2(function() { throw 0; });
 
 
-
-// MATH
-
-var _Basics_add = F2(function(a, b) { return a + b; });
-var _Basics_sub = F2(function(a, b) { return a - b; });
-var _Basics_mul = F2(function(a, b) { return a * b; });
-var _Basics_fdiv = F2(function(a, b) { return a / b; });
-var _Basics_idiv = F2(function(a, b) { return (a / b) | 0; });
-var _Basics_pow = F2(Math.pow);
-
-var _Basics_remainderBy = F2(function(b, a) { return a % b; });
-
-// https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
-var _Basics_modBy = F2(function(modulus, x)
-{
-	var answer = x % modulus;
-	return modulus === 0
-		? _Debug_crash(11)
-		:
-	((answer > 0 && modulus < 0) || (answer < 0 && modulus > 0))
-		? answer + modulus
-		: answer;
-});
-
-
-// TRIGONOMETRY
-
-var _Basics_pi = Math.PI;
-var _Basics_e = Math.E;
-var _Basics_cos = Math.cos;
-var _Basics_sin = Math.sin;
-var _Basics_tan = Math.tan;
-var _Basics_acos = Math.acos;
-var _Basics_asin = Math.asin;
-var _Basics_atan = Math.atan;
-var _Basics_atan2 = F2(Math.atan2);
-
-
-// MORE MATH
-
-function _Basics_toFloat(x) { return x; }
-function _Basics_truncate(n) { return n | 0; }
-function _Basics_isInfinite(n) { return n === Infinity || n === -Infinity; }
-
-var _Basics_ceiling = Math.ceil;
-var _Basics_floor = Math.floor;
-var _Basics_round = Math.round;
-var _Basics_sqrt = Math.sqrt;
-var _Basics_log = Math.log;
-var _Basics_isNaN = isNaN;
-
-
-// BOOLEANS
-
-function _Basics_not(bool) { return !bool; }
-var _Basics_and = F2(function(a, b) { return a && b; });
-var _Basics_or  = F2(function(a, b) { return a || b; });
-var _Basics_xor = F2(function(a, b) { return a !== b; });
-
-
 /*
  * Copyright (c) 2010 Mozilla Corporation
  * Copyright (c) 2010 Vladimir Vukicevic
@@ -2233,6 +2173,66 @@ var _MJS_m4x4makeBasis = F3(function(vx, vy, vz) {
 
     return r;
 });
+
+
+
+// MATH
+
+var _Basics_add = F2(function(a, b) { return a + b; });
+var _Basics_sub = F2(function(a, b) { return a - b; });
+var _Basics_mul = F2(function(a, b) { return a * b; });
+var _Basics_fdiv = F2(function(a, b) { return a / b; });
+var _Basics_idiv = F2(function(a, b) { return (a / b) | 0; });
+var _Basics_pow = F2(Math.pow);
+
+var _Basics_remainderBy = F2(function(b, a) { return a % b; });
+
+// https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
+var _Basics_modBy = F2(function(modulus, x)
+{
+	var answer = x % modulus;
+	return modulus === 0
+		? _Debug_crash(11)
+		:
+	((answer > 0 && modulus < 0) || (answer < 0 && modulus > 0))
+		? answer + modulus
+		: answer;
+});
+
+
+// TRIGONOMETRY
+
+var _Basics_pi = Math.PI;
+var _Basics_e = Math.E;
+var _Basics_cos = Math.cos;
+var _Basics_sin = Math.sin;
+var _Basics_tan = Math.tan;
+var _Basics_acos = Math.acos;
+var _Basics_asin = Math.asin;
+var _Basics_atan = Math.atan;
+var _Basics_atan2 = F2(Math.atan2);
+
+
+// MORE MATH
+
+function _Basics_toFloat(x) { return x; }
+function _Basics_truncate(n) { return n | 0; }
+function _Basics_isInfinite(n) { return n === Infinity || n === -Infinity; }
+
+var _Basics_ceiling = Math.ceil;
+var _Basics_floor = Math.floor;
+var _Basics_round = Math.round;
+var _Basics_sqrt = Math.sqrt;
+var _Basics_log = Math.log;
+var _Basics_isNaN = isNaN;
+
+
+// BOOLEANS
+
+function _Basics_not(bool) { return !bool; }
+var _Basics_and = F2(function(a, b) { return a && b; });
+var _Basics_or  = F2(function(a, b) { return a || b; });
+var _Basics_xor = F2(function(a, b) { return a !== b; });
 
 
 
@@ -5680,13 +5680,6 @@ function _Browser_load(url)
 var author$project$Main$BinaryResponse = function (a) {
 	return {$: 'BinaryResponse', a: a};
 };
-var elm$bytes$Bytes$LE = {$: 'LE'};
-var elm$bytes$Bytes$Decode$Done = function (a) {
-	return {$: 'Done', a: a};
-};
-var elm$bytes$Bytes$Decode$Loop = function (a) {
-	return {$: 'Loop', a: a};
-};
 var elm$bytes$Bytes$Decode$Decoder = function (a) {
 	return {$: 'Decoder', a: a};
 };
@@ -5697,20 +5690,6 @@ var elm$core$Basics$apL = F2(
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
-var elm$bytes$Bytes$Decode$andThen = F2(
-	function (callback, _n0) {
-		var decodeA = _n0.a;
-		return elm$bytes$Bytes$Decode$Decoder(
-			F2(
-				function (bites, offset) {
-					var _n1 = A2(decodeA, bites, offset);
-					var newOffset = _n1.a;
-					var a = _n1.b;
-					var _n2 = callback(a);
-					var decodeB = _n2.a;
-					return A2(decodeB, bites, newOffset);
-				}));
-	});
 var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var elm$core$Array$foldr = F3(
 	function (func, baseCase, _n0) {
@@ -5791,6 +5770,29 @@ var elm$core$Set$toList = function (_n0) {
 	var dict = _n0.a;
 	return elm$core$Dict$keys(dict);
 };
+var elm$bytes$Bytes$Decode$map2 = F3(
+	function (func, _n0, _n1) {
+		var decodeA = _n0.a;
+		var decodeB = _n1.a;
+		return elm$bytes$Bytes$Decode$Decoder(
+			F2(
+				function (bites, offset) {
+					var _n2 = A2(decodeA, bites, offset);
+					var aOffset = _n2.a;
+					var a = _n2.b;
+					var _n3 = A2(decodeB, bites, aOffset);
+					var bOffset = _n3.a;
+					var b = _n3.b;
+					return _Utils_Tuple2(
+						bOffset,
+						A2(func, a, b));
+				}));
+	});
+var author$project$Stl$andMap = F2(
+	function (next, current) {
+		return A3(elm$bytes$Bytes$Decode$map2, elm$core$Basics$apL, current, next);
+	});
+var elm$bytes$Bytes$LE = {$: 'LE'};
 var elm$core$Basics$eq = _Utils_equal;
 var elm$bytes$Bytes$Encode$getWidth = function (builder) {
 	switch (builder.$) {
@@ -5934,6 +5936,61 @@ var elm$core$Basics$apR = F2(
 	function (x, f) {
 		return f(x);
 	});
+var elm_explorations$linear_algebra$Math$Vector3$vec3 = _MJS_v3;
+var author$project$Stl$decodeVec3 = A2(
+	author$project$Stl$andMap,
+	elm$bytes$Bytes$Decode$float32(elm$bytes$Bytes$LE),
+	A2(
+		author$project$Stl$andMap,
+		elm$bytes$Bytes$Decode$float32(elm$bytes$Bytes$LE),
+		A2(
+			author$project$Stl$andMap,
+			elm$bytes$Bytes$Decode$float32(elm$bytes$Bytes$LE),
+			elm$bytes$Bytes$Decode$succeed(elm_explorations$linear_algebra$Math$Vector3$vec3))));
+var author$project$Stl$decodeTriangle = A2(
+	author$project$Stl$andMap,
+	author$project$Stl$decodeVec3,
+	A2(
+		author$project$Stl$andMap,
+		author$project$Stl$decodeVec3,
+		A2(
+			author$project$Stl$andMap,
+			author$project$Stl$decodeVec3,
+			A2(
+				author$project$Stl$andMap,
+				author$project$Stl$decodeVec3,
+				elm$bytes$Bytes$Decode$succeed(
+					F4(
+						function (normal, v1, v2, v3) {
+							return {
+								normal: normal,
+								vertices: _Utils_Tuple3(v1, v2, v3)
+							};
+						}))))));
+var elm$bytes$Bytes$Decode$Done = function (a) {
+	return {$: 'Done', a: a};
+};
+var elm$bytes$Bytes$Decode$Loop = function (a) {
+	return {$: 'Loop', a: a};
+};
+var elm$bytes$Bytes$Decode$andThen = F2(
+	function (callback, _n0) {
+		var decodeA = _n0.a;
+		return elm$bytes$Bytes$Decode$Decoder(
+			F2(
+				function (bites, offset) {
+					var _n1 = A2(decodeA, bites, offset);
+					var newOffset = _n1.a;
+					var a = _n1.b;
+					var _n2 = callback(a);
+					var decodeB = _n2.a;
+					return A2(decodeB, bites, newOffset);
+				}));
+	});
+var elm$bytes$Bytes$Decode$bytes = function (n) {
+	return elm$bytes$Bytes$Decode$Decoder(
+		_Bytes_read_bytes(n));
+};
 var elm$core$Basics$sub = _Basics_sub;
 var elm$core$List$foldl = F3(
 	function (func, acc, list) {
@@ -5957,157 +6014,27 @@ var elm$core$List$foldl = F3(
 var elm$core$List$reverse = function (list) {
 	return A3(elm$core$List$foldl, elm$core$List$cons, _List_Nil, list);
 };
-var author$project$Stl$loopNumbers = function (_n0) {
+var author$project$Stl$loopTriangle = function (_n0) {
 	var count = _n0.a;
-	var nums = _n0.b;
+	var triangles = _n0.b;
 	return (!count) ? elm$bytes$Bytes$Decode$succeed(
 		elm$bytes$Bytes$Decode$Done(
-			elm$core$List$reverse(nums))) : A2(
+			elm$core$List$reverse(triangles))) : A2(
 		elm$bytes$Bytes$Decode$andThen,
-		function (num) {
-			return elm$bytes$Bytes$Decode$succeed(
-				elm$bytes$Bytes$Decode$Loop(
-					_Utils_Tuple2(
-						count - 1,
-						A2(elm$core$List$cons, num, nums))));
-		},
-		elm$bytes$Bytes$Decode$float32(elm$bytes$Bytes$LE));
-};
-var elm$core$List$tail = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return elm$core$Maybe$Just(xs);
-	} else {
-		return elm$core$Maybe$Nothing;
-	}
-};
-var author$project$Stl$rest = function (list) {
-	var _n0 = elm$core$List$tail(list);
-	if (_n0.$ === 'Nothing') {
-		return _List_Nil;
-	} else {
-		var elts = _n0.a;
-		return elts;
-	}
-};
-var elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return elm$core$Maybe$Just(x);
-	} else {
-		return elm$core$Maybe$Nothing;
-	}
-};
-var elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
-var author$project$Stl$makeThing1 = F2(
-	function (f, lst) {
-		return A2(
-			elm$core$Maybe$andThen,
-			function (fb) {
-				return elm$core$Maybe$Just(
-					_Utils_Tuple2(
-						fb,
-						author$project$Stl$rest(lst)));
-			},
-			A2(
-				elm$core$Maybe$map,
-				f,
-				elm$core$List$head(lst)));
-	});
-var author$project$Stl$makeThing2 = F2(
-	function (f, lst) {
-		return A2(
-			elm$core$Maybe$andThen,
-			function (g) {
-				return A2(
-					author$project$Stl$makeThing1,
-					g,
-					author$project$Stl$rest(lst));
-			},
-			A2(
-				elm$core$Maybe$map,
-				f,
-				elm$core$List$head(lst)));
-	});
-var author$project$Stl$makeThing3 = F2(
-	function (f, lst) {
-		return A2(
-			elm$core$Maybe$andThen,
-			function (g) {
-				return A2(
-					author$project$Stl$makeThing2,
-					g,
-					author$project$Stl$rest(lst));
-			},
-			A2(
-				elm$core$Maybe$map,
-				f,
-				elm$core$List$head(lst)));
-	});
-var elm_explorations$linear_algebra$Math$Vector3$vec3 = _MJS_v3;
-var author$project$Stl$numsToVec3 = function (nums) {
-	return A2(author$project$Stl$makeThing3, elm_explorations$linear_algebra$Math$Vector3$vec3, nums);
-};
-var author$project$Stl$numsToTriangle = function (floats) {
-	return A2(
-		elm$core$Maybe$andThen,
-		function (_n0) {
-			var v1 = _n0.a;
-			var flts = _n0.b;
+		function (t) {
 			return A2(
-				elm$core$Maybe$andThen,
+				elm$bytes$Bytes$Decode$andThen,
 				function (_n1) {
-					var v2 = _n1.a;
-					var flts2 = _n1.b;
-					return A2(
-						elm$core$Maybe$andThen,
-						function (_n2) {
-							var v3 = _n2.a;
-							var flts3 = _n2.b;
-							return A2(
-								elm$core$Maybe$andThen,
-								function (_n3) {
-									var v4 = _n3.a;
-									var flts4 = _n3.b;
-									return elm$core$Maybe$Just(
-										{
-											normal: v1,
-											vertices: _Utils_Tuple3(v2, v3, v4)
-										});
-								},
-								author$project$Stl$numsToVec3(flts3));
-						},
-						author$project$Stl$numsToVec3(flts2));
+					return elm$bytes$Bytes$Decode$succeed(
+						elm$bytes$Bytes$Decode$Loop(
+							_Utils_Tuple2(
+								count - 1,
+								A2(elm$core$List$cons, t, triangles))));
 				},
-				author$project$Stl$numsToVec3(flts));
+				elm$bytes$Bytes$Decode$bytes(2));
 		},
-		author$project$Stl$numsToVec3(floats));
+		author$project$Stl$decodeTriangle);
 };
-var elm$bytes$Bytes$Decode$bytes = function (n) {
-	return elm$bytes$Bytes$Decode$Decoder(
-		_Bytes_read_bytes(n));
-};
-var elm$bytes$Bytes$Decode$fail = elm$bytes$Bytes$Decode$Decoder(_Bytes_decodeFailure);
 var elm$bytes$Bytes$Decode$loopHelp = F4(
 	function (state, callback, bites, offset) {
 		loopHelp:
@@ -6139,36 +6066,6 @@ var elm$bytes$Bytes$Decode$loop = F2(
 		return elm$bytes$Bytes$Decode$Decoder(
 			A2(elm$bytes$Bytes$Decode$loopHelp, state, callback));
 	});
-var author$project$Stl$loopTriangle = function (_n0) {
-	var count = _n0.a;
-	var triangles = _n0.b;
-	return (!count) ? elm$bytes$Bytes$Decode$succeed(
-		elm$bytes$Bytes$Decode$Done(
-			elm$core$List$reverse(triangles))) : A2(
-		elm$bytes$Bytes$Decode$andThen,
-		function (t) {
-			return A2(
-				elm$bytes$Bytes$Decode$andThen,
-				function (_n1) {
-					var _n2 = author$project$Stl$numsToTriangle(t);
-					if (_n2.$ === 'Just') {
-						var tri = _n2.a;
-						return elm$bytes$Bytes$Decode$succeed(
-							elm$bytes$Bytes$Decode$Loop(
-								_Utils_Tuple2(
-									count - 1,
-									A2(elm$core$List$cons, tri, triangles))));
-					} else {
-						return elm$bytes$Bytes$Decode$fail;
-					}
-				},
-				elm$bytes$Bytes$Decode$bytes(2));
-		},
-		A2(
-			elm$bytes$Bytes$Decode$loop,
-			_Utils_Tuple2(12, _List_Nil),
-			author$project$Stl$loopNumbers));
-};
 var elm$bytes$Bytes$Decode$unsignedInt32 = function (endianness) {
 	return elm$bytes$Bytes$Decode$Decoder(
 		_Bytes_read_u32(
