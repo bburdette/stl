@@ -7,7 +7,7 @@
     "exposed-modules": [
         "Stl"
     ],
-    "elm-version": "0.19.0 <= v < 0.19.1",
+    "elm-version": "0.19.0 <= v < 0.19.2",
     "dependencies": {
         "elm/bytes": "1.0.7 <= v < 2.0.0",
         "elm/core": "1.0.0 <= v < 2.0.0",
